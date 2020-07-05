@@ -1,15 +1,13 @@
 package mycrypto
 
 import (
-	"crypto/md5"
 	"encoding/base64"
-	"encoding/hex"
 	"math"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
-
+	//test
 	"github.com/tidusant/chadmin-log"
 	"github.com/tidusant/chadmin-string"
 )
@@ -39,26 +37,6 @@ func Base64fix(s string) string {
 	}
 	return s
 }
-func Base64Compress(s string) string {
-	return CompressToBase64(s)
-}
-func MD5(text string) string {
-	algorithm := md5.New()
-	algorithm.Write([]byte(text))
-	return hex.EncodeToString(algorithm.Sum(nil))
-}
-
-func Base64Decompress(s string) string {
-	byteDecode, _ := DecompressFromBase64(s)
-	return byteDecode
-}
-func Base64Encode(s string) string {
-	return base64.StdEncoding.EncodeToString([]byte(s))
-}
-func Base64Decode(s string) string {
-	byteDecode, _ := base64.StdEncoding.DecodeString(Base64fix(s))
-	return string(byteDecode)
-}
 func CampaignDecode(data string) string {
 	code := data[:len(data)/2]
 	code = strings.Replace(data, code, "", 1) + code
@@ -68,9 +46,7 @@ func CampaignDecode(data string) string {
 
 //for decode old
 func Encode(data string, div int) string {
-	if data == "" {
-		return data
-	}
+
 	var x = NumRand(2, 9)
 	//log.Debugf("random x :%s", x)
 	var x2 = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(x)))
@@ -116,102 +92,6 @@ func Encode(data string, div int) string {
 	return strb64
 }
 
-func EncodeLight1(data string, div int) string {
-	if data == "" {
-		return data
-	}
-	var x = NumRand(2, 9)
-	//log.Debugf("random x :%s", x)
-	var x2 = base64.StdEncoding.EncodeToString([]byte(strconv.Itoa(x)))
-	x2 = strings.Replace(x2, "=", "", -1)
-	//log.Debugf("x2 base 64 :%s", x2)
-	//x2b := []byte(x2)
-	if div == 2 {
-		data = CompressToBase64(data)
-
-	} else {
-		data = base64.StdEncoding.EncodeToString([]byte(data))
-		//log.Debugf("data base 64 :%s", data)
-	}
-
-	data = strings.Replace(data, "=", "", -1)
-
-	xstr := mystring.RandString(x)
-	//log.Debugf("xstr RandString(x):%s", xstr)
-
-	data += xstr
-
-	var l = int(math.Floor(float64(len(data) / div)))
-
-	strb64 := data[:l] + x2 + data[l:]
-	//log.Debugf("strb64:%s", strb64)
-
-	return strb64
-}
-
-func DecodeLight1(code string, div int) string {
-
-	if code == "" {
-		return code
-	}
-	var rt string = ""
-
-	l := int(math.Floor(float64((len(code) - 2) / div)))
-	//log.Debugf("l :%s", l)
-	//var l = int(math.Floor(float64(len(data) / div)))
-
-	//log.Debugf("x2 :%s", x2)
-	key := code[:l] + code[l+2:]
-
-	x2 := code[l : l+2]
-	//log.Debugf("rs1 + rs 2 :%s", key)
-	byteDecode, _ := base64.StdEncoding.DecodeString(Base64fix(x2))
-	x2 = string(byteDecode)
-
-	floatNum, _ := strconv.ParseFloat(x2, 64)
-	intNum := (int)(floatNum)
-	key = key[:len(key)-intNum]
-
-	// //log.Debugf("x :%s", intNum)
-	// if intNum > 0 {
-	// 	//print_r($num);print_r("\r\n");
-	// 	//get odd string
-	// 	lf := math.Ceil((float64)(len(key)) / floatNum)
-	// 	//log.Debugf("lf :%s", lf)
-	// 	oddstr := key[:int(lf)]
-	// 	//log.Debugf("oddstr key[:int(lf)] :%s", oddstr)
-	// 	ukey := strings.Replace(key, oddstr, "", 1)
-	// 	//log.Debugf("ukey Replace(key, oddstr :%s", ukey)
-	// 	base64str := ""
-
-	// 	for i := len(oddstr) - 1; i >= 0; i-- {
-	// 		base64str += string(oddstr[len(oddstr)-1:])
-	// 		oddstr = oddstr[:len(oddstr)-1]
-	// 		if len(ukey)-intNum+1 > 0 {
-	// 			base64str += mystring.Reverse(string(ukey[len(ukey)-intNum+1:]))
-	// 		} else {
-	// 			base64str += mystring.Reverse(ukey)
-	// 		}
-	// 		if i > 0 {
-	// 			ukey = ukey[:len(ukey)-intNum+1]
-	// 		}
-	// 	}
-	// 	//log.Debugf("base64str :%s", base64str)
-	// 	base64str = base64str[:len(base64str)-intNum]
-
-	if div == 2 {
-		byteDecode, _ := DecompressFromBase64(key)
-		rt = byteDecode
-	} else {
-		byteDecode, _ := base64.StdEncoding.DecodeString(Base64fix(key))
-		rt = string(byteDecode)
-	}
-
-	//}
-	return rt
-}
-
-//for encode
 func DecodeOld(code string, div int) string {
 	if code == "" {
 		return code
@@ -285,132 +165,24 @@ func DecodeOld(code string, div int) string {
 	return rt
 }
 
-//for decode old
-func EncodeApp(data string, div int) string {
-	if data == "" {
-		return data
-	}
-	var x = NumRand(10, 99)
-	//log.Debugf("random x :%s", x)
-
-	data = strings.Replace(data, "=", "", -1)
-
-	xstr := mystring.RandString(x)
-	//log.Debugf("xstr RandString(x):%s", xstr)
-
-	data += xstr
-
-	b := []byte(data)
-
-	var l = int(math.Floor(float64(len(data) / div)))
-	//log.Debugf("l :%s", l)
-	var result1 []byte
-	var result2 []byte
-
-	for i := len(b) - 1; i >= 0; i-- {
-
-		if i%div == 0 {
-			result1 = append(result1, b[i]) // string([]rune(data)[i])
-
-		} else {
-			result2 = append(result2, b[i])
-		}
-	}
-	log.Debugf("string(result1):%s", string(result1))
-	log.Debugf("string(result2):%s", string(result2))
-	strb64 := string(result1) + string(result2)
-	strb64 = strb64[:l] + strconv.Itoa(x) + strb64[l:]
-	log.Debugf("strb64:%s", strb64)
-	return strb64
-}
-
-func DecodeApp(data string, div int) string {
-	if data == "" {
-		return data
-	}
-	var rt string = ""
-	key := data
-	//key = "kZXUuYkRWzUgQk92YoNwRdh92Q3SZtFmb9Wa0NW"
-	if data == rt {
-		return rt
-	}
-
-	oddstr := "d"
-	l := int(math.Floor(float64((len(data) - 2) / div)))
-	//log.Debugf("l :%s", l)
-	//var l = int(math.Floor(float64(len(data) / div)))
-	x, _ := strconv.Atoi(data[l : l+2])
-	//log.Debugf("x2 :%s", x2)
-	key = data[:l] + data[l+2:]
-
-	floatNum, _ := strconv.ParseFloat(strconv.Itoa(div), 64)
-	intNum := (int)(floatNum)
-	//log.Debugf("x :%s", intNum)
-	if intNum > 0 {
-		//print_r($num);print_r("\r\n");
-		//get odd string
-		lf := math.Ceil((float64)(len(key)) / floatNum)
-		log.Debugf("lf :%s", lf)
-		oddstr = key[:int(lf)]
-		log.Debugf("oddstr key[:int(lf)] :%s", oddstr)
-		ukey := strings.Replace(key, oddstr, "", 1)
-		log.Debugf("ukey Replace(key, oddstr :%s", ukey)
-		base64str := ""
-
-		for i := len(oddstr) - 1; i >= 0; i-- {
-			base64str += string(oddstr[len(oddstr)-1:])
-			oddstr = oddstr[:len(oddstr)-1]
-			if len(ukey)-intNum+1 > 0 {
-				base64str += mystring.Reverse(string(ukey[len(ukey)-intNum+1:]))
-			} else {
-				base64str += mystring.Reverse(ukey)
-			}
-			if i > 0 {
-				ukey = ukey[:len(ukey)-intNum+1]
-			}
-		}
-		//log.Debugf("base64str :%s", base64str)
-		rt = base64str[:len(base64str)-x]
-
-	}
-	return rt
-}
-
-//not have random url
 func EncodeBK(data string, keysalt string) string {
-	if data == "" {
-		return data
-	}
 	//data = CompressToBase64(data)
 	data = base64.StdEncoding.EncodeToString([]byte(data))
 	data = strings.Replace(data, "=", "", -1)
 	//log.Debugf("keysalt: %s", keysalt)
 	keysalt = base64.StdEncoding.EncodeToString([]byte(keysalt))
 	keysalt = strings.Replace(keysalt, "=", "", -1)
-	x := mystring.RandString(len(keysalt))
 	//log.Debugf("keysalt: %s", keysalt)
-	l := len(x)
-	if len(x) > len(data) {
-		l = len(data)
-	}
-	data = data[:l] + x + data[l:]
+	l := 3
+	data = data[:l] + keysalt + data[l:]
 	//log.Println("strReturn: %s", data)
 	return data
 }
 
 func DecodeBK(data string, keysalt string) string {
-	if data == "" {
-		return data
-	}
 	keysalt = base64.StdEncoding.EncodeToString([]byte(keysalt))
 	keysalt = strings.Replace(keysalt, "=", "", -1)
-	l := len(keysalt)
-	if l*2 > len(data) {
-		l = len(data) - l
-	}
-
-	data = data[:l] + data[l+len(keysalt):]
-
+	data = strings.Replace(data, keysalt, "", 1)
 	data = Base64fix(data)
 	//byteDecode, _ := DecompressFromBase64(data)
 	byteDecode, _ := base64.StdEncoding.DecodeString(data)
@@ -420,9 +192,7 @@ func DecodeBK(data string, keysalt string) string {
 
 //for encDatA
 func EncodeA(data string) string {
-	if data == "" {
-		return data
-	}
+
 	var x = NumRand(2, 9)
 
 	//x2b := []byte(x2)
@@ -454,9 +224,7 @@ func EncodeA(data string) string {
 
 //for encDatA
 func DecodeA(data string) string {
-	if data == "" {
-		return data
-	}
+
 	oddb64, _ := base64.StdEncoding.DecodeString(Base64fix(data[len(data)-2:]))
 	odd, _ := strconv.Atoi(string(oddb64))
 
@@ -479,34 +247,12 @@ func DecodeA(data string) string {
 	return string(datab)
 }
 
-func EncDat2(data string) string {
-	if data == "" {
-		return data
-	}
-	l := NumRand(1, len(data)) //random from 1 to data len
-	oddnumber := 10
-	x := mystring.RandString(oddnumber)
-	y := base64.StdEncoding.EncodeToString([]byte(x))
-	y = strings.Replace(y, "=", "", -1)
-
-	data = data[:l] + y + data[l:]
-	data = base64.StdEncoding.EncodeToString([]byte(data))
-	data = strings.Replace(data, "=", "", -1)
-	return x + data
-}
-
 //for encDat2
 func Decode(data string) string {
-	if data == "" {
-		return data
-	}
 	if len(data) < 10 {
 		log.Errorf("cannot decode %s", data)
 		return data
 	}
-	//fix + char
-	data = strings.Replace(data, " ", "+", -1)
-
 	x := 10
 	xstr := data[:x]
 	data = data[x:]
@@ -520,9 +266,7 @@ func Decode(data string) string {
 }
 
 func Encode2(data string) string {
-	if data == "" {
-		return data
-	}
+
 	oddnumber := NumRand(1, 9)
 	x := mystring.RandString(oddnumber)
 	//log.Debugf("x: %s", x)
@@ -541,9 +285,6 @@ func Encode2(data string) string {
 	return x + data + oddb64
 }
 func Decode2(data string) string {
-	if data == "" {
-		return data
-	}
 	if len(data) < 10 {
 		log.Errorf("cannot decode %s", data)
 		return data
@@ -584,9 +325,6 @@ func Decode2(data string) string {
 }
 
 func Encode3(data string) string {
-	if data == "" {
-		return data
-	}
 	data = base64.StdEncoding.EncodeToString([]byte(data))
 	data = strings.Replace(data, "=", "", -1)
 	var datalen = len(data)
@@ -609,9 +347,7 @@ func Encode3(data string) string {
 }
 
 func Decode3(data string) string {
-	if data == "" {
-		return data
-	}
+
 	oddb64 := data[len(data)-2:]
 	data = data[:len(data)-2]
 
@@ -643,8 +379,7 @@ func Encode4(data string) string {
 
 	data = xstr + data
 
-	//data = CompressToBase64(data)
-	data = base64.StdEncoding.EncodeToString([]byte(data))
+	data = CompressToBase64(data)
 	data = strings.Replace(data, "=", "", -1)
 
 	b := []byte(data)
@@ -673,9 +408,7 @@ func Encode4(data string) string {
 }
 
 func Decode4(data string) string {
-	if data == "" {
-		return data
-	}
+
 	ld := len(data)/2 - 1
 	var x2 = data[ld : ld+2]
 
@@ -697,9 +430,7 @@ func Decode4(data string) string {
 		}
 	}
 
-	//data, _ = DecompressFromBase64(rs)
-	tmp, _ := base64.StdEncoding.DecodeString(Base64fix(rs))
-	data = string(tmp)
+	data, _ = DecompressFromBase64(rs)
 
 	data = data[x:]
 	return data
@@ -707,9 +438,7 @@ func Decode4(data string) string {
 
 //encode for wapi
 func EncodeW(data string) string {
-	if data == "" {
-		return data
-	}
+
 	var x2 = base64.StdEncoding.EncodeToString([]byte(data))
 	x2 = strings.Replace(x2, "=", "", -1)
 	return x2
